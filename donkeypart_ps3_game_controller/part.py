@@ -5,8 +5,6 @@ import time
 import struct
 
 
-from donkeycar.parts.web_controller.web import LocalWebController
-
 
 class Joystick():
     '''

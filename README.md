@@ -1,4 +1,4 @@
-## PS3 Joystick Controller
+# PS3 Joystick Controller
 
 The default web controller may be replaced with a one line change to use a physical joystick part for input. This uses 
 the OS device /dev/input/js0 by default. In theory, any joystick device that the OS mounts like this can be used. In 
@@ -11,14 +11,44 @@ and the Bluetooth driver used to support it. The default code has been written a
 These can be used plugged in with a USB cable - but the default code and os driver has a bug polling this configuration. 
 It's been much more stable, and convenient, to setup Bluetooth for a wireless, responsive control.
 
-### Change to config.py or run with --js
+## Install
 
-```
-python manage.py drive --js
-```
+1. Connect your bluetooth controller to the raspberry pi. See the Bluetooth section below.
 
-Will enable driving with the joystick. This disables the live preview of the camera and the web page features. 
-If you modify config.py to make USE_JOYSTICK_AS_DEFAULT = True, then you do not need to run with the --js.
+2. Install the parts python package.
+    ```bash
+    pip install git+https://github.com/autorope/donkeypart_ps3_controller.git
+    ```
+
+3. Import the part at the top of your manage.py script.
+    ```python
+    from donkeypart_ps3_controller import JoystickController
+    ```   
+    
+4. Replace the controller part of your manage.py to use the JoysticController part.
+    ```python
+    ctr = JoystickController(
+       max_throttle=cfg.JOYSTICK_MAX_THROTTLE,
+       steering_scale=cfg.JOYSTICK_STEERING_SCALE,
+       throttle_axis=cfg.JOYSTICK_THROTTLE_AXIS,
+       auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE
+    )
+
+     V.add(ctr,
+          inputs=['cam/image_array'],
+          outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
+          threaded=True)
+    ```
+
+5. Add the required config paramters to your config.py file. It should look something like this.
+    ```python
+    #JOYSTICK
+    JOYSTICK_MAX_THROTTLE = 0.25
+    JOYSTICK_STEERING_SCALE = 1.0
+    JOYSTICK_THROTTLE_AXIS = 'rz'
+    AUTO_RECORD_ON_THROTTLE = True
+    ```
+6. Now you're ready to run the `python manage.py drive` command to start your car. 
 
 ### Bluetooth Setup
 
@@ -73,7 +103,6 @@ charger or your PC, and you are good to go.
 Sometimes these controllers can be quite old. Here's a link to a [new battery](http://a.co/5k1lbns). Be careful when 
 taking off the cover. Remove 5 screws. There's a tab on the top half between the hand grips. You'll want to split/open
  it from the front and try pulling the bottom forward as you do, or you'll break the tab off as I did.
-
 
 
 ### Joystick Controls
