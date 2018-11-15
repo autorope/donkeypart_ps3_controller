@@ -22,12 +22,12 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
 
 3. Import the part at the top of your manage.py script.
     ```python
-    from donkeypart_ps3_controller import JoystickController
+    from donkeypart_ps3_controller import PS3Joystick
     ```   
     
 4. Replace the controller part of your manage.py to use the JoysticController part.
     ```python
-    ctr = JoystickController(
+    ctr = PS3Joystick(
        max_throttle=cfg.JOYSTICK_MAX_THROTTLE,
        steering_scale=cfg.JOYSTICK_STEERING_SCALE,
        throttle_axis=cfg.JOYSTICK_THROTTLE_AXIS,
@@ -122,3 +122,12 @@ taking off the cover. Remove 5 screws. There's a tab on the top half between the
 * dpad left - Increase steering scale
 * dpad right - Decrease steering scale
 * Start - Toggle constant throttle. Sets to max throttle (modified by X and Triangle).
+
+### Driving tips
+Hit the Select button to toggle between three modes - User, Local Angle, and Local Throttle & Angle.
+
+* User - User controls both steering and throttle with joystick
+* Local Angle - Ai controls steering, user controls throttle
+* Local Throttle & Angle - Ai controls both steering and throttle
+
+When the car is in Local Angle mode, the NN will steer. You must provide throttle.
