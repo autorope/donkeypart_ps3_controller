@@ -1,16 +1,16 @@
 The code for this part was copied from [Tawn Kramer's](https://github.com/tawnkramer/donkey) fork of donkeycar.
 
-# PS3 Joystick Controller
+# PS3/PS4 Joystick Controller
 
-The default web controller may be replaced with a one line change to use a physical joystick part for input. This uses 
-the OS device /dev/input/js0 by default. In theory, any joystick device that the OS mounts like this can be used. In 
-practice, the behavior will change depending on the model of joystick ( Sony, or knockoff ), or XBox controller 
+The default web controller may be replaced with a one line change to use a physical joystick part for input. This uses
+the OS device /dev/input/js0 by default. In theory, any joystick device that the OS mounts like this can be used. In
+practice, the behavior will change depending on the model of joystick ( Sony, or knockoff ), or XBox controller
 and the Bluetooth driver used to support it. The default code has been written and tested with
- a [Sony brand PS3 Sixaxis controller](https://www.amazon.com/Dualshock-Wireless-Controller-Charcoal-playstation-3). 
- Other controllers may work, but will require alternative Bluetooth installs, and tweaks to the software for correct 
+ a [Sony brand PS3 Sixaxis controller](https://www.amazon.com/Dualshock-Wireless-Controller-Charcoal-playstation-3).
+ Other controllers may work, but will require alternative Bluetooth installs, and tweaks to the software for correct
  axis and buttons.
 
-These can be used plugged in with a USB cable - but the default code and os driver has a bug polling this configuration. 
+These can be used plugged in with a USB cable - but the default code and os driver has a bug polling this configuration.
 It's been much more stable, and convenient, to setup Bluetooth for a wireless, responsive control.
 
 ## Install
@@ -22,17 +22,16 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
     pip install git+https://github.com/autorope/donkeypart_ps3_controller.git
     ```
 
-3. Import the part at the top of your manage.py script.
+3. Import the part at the top of your manage.py script. If you are using a PS4 controller, import `PS4JoystickController` instead. Same applies in the next step.
     ```python
-    from donkeypart_ps3_controller import PS3Joystick
+    from donkeypart_ps3_controller.part import PS3JoystickController
     ```   
-    
+
 4. Replace the controller part of your manage.py to use the JoysticController part.
     ```python
-    ctr = PS3Joystick(
-       max_throttle=cfg.JOYSTICK_MAX_THROTTLE,
+    ctr = PS3JoystickController(
+       throttle_scale=cfg.JOYSTICK_MAX_THROTTLE,
        steering_scale=cfg.JOYSTICK_STEERING_SCALE,
-       throttle_axis=cfg.JOYSTICK_THROTTLE_AXIS,
        auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE
     )
 
@@ -50,11 +49,11 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
     JOYSTICK_THROTTLE_AXIS = 'rz'
     AUTO_RECORD_ON_THROTTLE = True
     ```
-6. Now you're ready to run the `python manage.py drive` command to start your car. 
+6. Now you're ready to run the `python manage.py drive --js` command to start your car.
 
 ### Bluetooth Setup
-
-Follow [this guide](https://pythonhosted.org/triangula/sixaxis.html). You can ignore steps past the 'Accessing 
+#### PS3 Controller
+Follow [this guide](https://pythonhosted.org/triangula/sixaxis.html). You can ignore steps past the 'Accessing
 the SixAxis from Python' section. I will include steps here in case the link becomes stale.
 
 ``` bash
@@ -91,18 +90,48 @@ To test that the Bluetooth PS3 remote is working, verify that /dev/input/js0 exi
 ls /dev/input/js0
 ```
 
+#### PS4 Controller
+
+The following instructions are based on [RetroPie](https://github.com/RetroPie/RetroPie-Setup/wiki/PS4-Controller#installation) and [ds4drv](https://github.com/chrippa/ds4drv).
+
+#### Install `ds4drv`.
+
+Running on your pi over ssh, you can directly `sudo /home/pi/env/bin/pip install ds4drv`
+
+#### Grant permission to `ds4drv`.
+
+```bash
+sudo wget https://raw.githubusercontent.com/chrippa/ds4drv/master/udev/50-ds4drv.rules -O /etc/udev/rules.d/50-ds4drv.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+#### Run `ds4drv`.
+
+`ds4drv --hidraw --led 00ff00`. If you see `Failed to create input device: "/dev/uinput" cannot be opened for writing`, reboot and retry. Probably granting permission step doesn't take effect until rebooting. Some controllers don't work with `--hidraw`. If that's the case try the command without it. `--led 00ff00` changes the light bar color, it's optional.
+
+#### Start controller in pairing mode.
+
+Press and hold **Share** button, then press and hold **PS** button until the light bar starts blinking. If it goes **green** after a few seconds, pairing is successful.
+
+#### Run `ds4drv` in background on startup once booted.
+
+`sudo nano /etc/rc.local`. paste `/home/pi/env/bin/ds4drv --led 00ff00` into the file. Save and exit. Again, with or without `--hidraw`, depending on the particular controller you are using.
+
+
+To disconnect, kill the process `ds4drv` and hold **PS** for 10 seconds to power off the controller.
+
 ### Charging PS3 Sixaxis Joystick
 
-For some reason, this joystick doesn't like to charge in a powered USB port that doesn't have an active Bluetooth 
-control and OS driver. This means a phone type USB charger will not work, and charging from a Windows machine doesn't 
+For some reason, this joystick doesn't like to charge in a powered USB port that doesn't have an active Bluetooth
+control and OS driver. This means a phone type USB charger will not work, and charging from a Windows machine doesn't
 work either.
 
-You can always charge from the Raspberry Pi, though.  Just plug the joystick into the Pi and power the Pi using a 
+You can always charge from the Raspberry Pi, though.  Just plug the joystick into the Pi and power the Pi using a
 charger or your PC, and you are good to go.
 
 ### New Battery for PS3 Sixaxis Joystick
 
-Sometimes these controllers can be quite old. Here's a link to a [new battery](http://a.co/5k1lbns). Be careful when 
+Sometimes these controllers can be quite old. Here's a link to a [new battery](http://a.co/5k1lbns). Be careful when
 taking off the cover. Remove 5 screws. There's a tab on the top half between the hand grips. You'll want to split/open
  it from the front and try pulling the bottom forward as you do, or you'll break the tab off as I did.
 
