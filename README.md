@@ -24,15 +24,13 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
 
 3. Import the part at the top of your manage.py script.
     ```python
-    from donkeypart_ps3_controller import PS3Joystick
+    from donkeypart_ps3_controller import PS3JoystickController
     ```   
     
 4. Replace the controller part of your manage.py to use the JoysticController part.
     ```python
-    ctr = PS3Joystick(
-       max_throttle=cfg.JOYSTICK_MAX_THROTTLE,
+    ctr = PS3JoystickController(
        steering_scale=cfg.JOYSTICK_STEERING_SCALE,
-       throttle_axis=cfg.JOYSTICK_THROTTLE_AXIS,
        auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE
     )
 
@@ -45,12 +43,10 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
 5. Add the required config paramters to your config.py file. It should look something like this.
     ```python
     #JOYSTICK
-    JOYSTICK_MAX_THROTTLE = 0.25
     JOYSTICK_STEERING_SCALE = 1.0
-    JOYSTICK_THROTTLE_AXIS = 'rz'
     AUTO_RECORD_ON_THROTTLE = True
     ```
-6. Now you're ready to run the `python manage.py drive` command to start your car. 
+6. Now you're ready to run the `python manage.py drive --js` command to start your car. 
 
 ### Bluetooth Setup
 
