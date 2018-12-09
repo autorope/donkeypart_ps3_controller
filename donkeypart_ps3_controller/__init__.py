@@ -1,1 +1,1 @@
-from .part import PS3Joystick
+from .part import PS3JoystickController
