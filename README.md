@@ -30,9 +30,11 @@ It's been much more stable, and convenient, to setup Bluetooth for a wireless, r
 4. Replace the controller part of your manage.py to use the JoysticController part.
     ```python
     ctr = PS3JoystickController(
-        throttle_scale=cfg.JOYSTICK_MAX_THROTTLE,
-        steering_scale=cfg.JOYSTICK_STEERING_SCALE,
-        auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE
+       max_throttle=cfg.JOYSTICK_MAX_THROTTLE,
+       steering_scale=cfg.JOYSTICK_STEERING_SCALE,
+       throttle_axis=cfg.JOYSTICK_THROTTLE_AXIS,
+       auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE
+
     )
 
      V.add(ctr,
