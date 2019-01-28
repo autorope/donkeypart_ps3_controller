@@ -354,6 +354,51 @@ class PS3JoystickPC(Joystick):
         }
 
 
+class XboxOneJoystick(Joystick):
+    '''
+    An interface to an unknown physical joystick
+    '''
+
+    def __init__(self, *args, **kwargs):
+        super(XboxOneJoystick, self).__init__(*args, **kwargs)
+
+        self.axis_names = {
+            0x00: 'left_stick_horz',
+            0x01: 'left_stick_vert',
+            0x02: 'right_stick_horz',
+            0x05: 'right_stick_vert',
+            0x09: 'right_trigger',
+            0x0a: 'left_trigger',
+            0x10: 'dpad_horz',
+            0x11: 'dpad_vert',
+        }
+
+        self.button_names = {
+            0x130: 'a_button',
+            0x131: 'b_button',
+            0x133: 'x_button',
+            0x134: 'y_button',
+            0x136: 'left_shoulder',
+            0x137: 'right_shoulder',
+            0x13b: 'options',
+        }
+
+
+class UnknownJoystick(Joystick):
+    '''
+    An interface to an unknown physical joystick
+    '''
+
+    def __init__(self, *args, **kwargs):
+        super(UnknownJoystick, self).__init__(*args, **kwargs)
+
+        self.axis_names = {
+        }
+
+        self.button_names = {
+        }
+
+
 class JoystickController(object):
     '''
     JoystickController is a base class. You will not use this class directly,
@@ -749,10 +794,11 @@ class JoyStickPub(object):
     Use Zero Message Queue (zmq) to publish the control messages from a local joystick
     '''
 
-    def __init__(self, port=5556, dev_fn='/dev/input/js1'):
+    def __init__(self, port=5556, dev_fn='/dev/input/js0'):
         import zmq
         self.dev_fn = dev_fn
-        self.js = PS3JoystickPC(self.dev_fn)
+        # self.js = UnknownJoystick(self.dev_fn)
+        self.js = XboxOneJoystick(self.dev_fn)
         self.js.init()
         context = zmq.Context()
         self.socket = context.socket(zmq.PUB)
@@ -826,5 +872,5 @@ if __name__ == "__main__":
     '''
     print("You may need:")
     print('xinput set-prop "Sony PLAYSTATION(R)3 Controller" "Device Enabled" 0')
-    p = JoyStickPub()
+    p = JoyStickPub(dev_fn='/dev/input/js0')
     p.run()
