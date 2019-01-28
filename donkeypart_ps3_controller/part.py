@@ -356,7 +356,19 @@ class PS3JoystickPC(Joystick):
 
 class XboxOneJoystick(Joystick):
     '''
-    An interface to an unknown physical joystick
+    An interface to a physical joystick 'Xbox Wireless Controller' controller.
+    This will generally show up on /dev/input/js0.
+    - Note that this code presumes the built-in linux driver for 'Xbox Wireless Controller'.
+      There is another user land driver called xboxdrv; this code has not been tested
+      with that driver.
+    - Note that this controller requires that the bluetooth disable_ertm parameter
+      be set to true; to do this:
+      - edit /etc/modprobe.d/xbox_bt.conf
+      - add the line: options bluetooth disable_ertm=1
+      - reboot to tha this take affect.
+      - after reboot you can vertify that disable_ertm is set to true entering this
+        command oin a terminal: cat /sys/module/bluetooth/parameters/disable_ertm
+      - the result should print 'Y'.  If not, make sure the above steps have been done corretly.
     '''
 
     def __init__(self, *args, **kwargs):
@@ -789,6 +801,47 @@ class PS4JoystickController(JoystickController):
         }
 
 
+class XboxOneJoystickController(JoystickController):
+    '''
+    A Controller object that maps inputs to actions
+    '''
+
+    def __init__(self, *args, **kwargs):
+        super(XboxOneJoystickController, self).__init__(*args, **kwargs)
+
+    def init_js(self):
+        '''
+        attempt to init joystick
+        '''
+        try:
+            self.js = XboxOneJoystick(self.dev_fn)
+            self.js.init()
+        except FileNotFoundError:
+            print(self.dev_fn, "not found.")
+            self.js = None
+        return self.js is not None
+
+    def init_trigger_maps(self):
+        '''
+        init set of mapping from buttons to function calls
+        '''
+
+        self.button_down_trigger_map = {
+            'a_button': self.toggle_mode,
+            'b_button': self.toggle_manual_recording,
+            'x_button': self.erase_last_N_records,
+            'y_button': self.emergency_stop,
+            'right_shoulder': self.increase_max_throttle,
+            'left_shoulder': self.decrease_max_throttle,
+            'options': self.toggle_constant_throttle,
+        }
+
+        self.axis_trigger_map = {
+            'left_stick_horz': self.set_steering,
+            'right_stick_vert': self.set_throttle,
+        }
+
+
 class JoyStickPub(object):
     '''
     Use Zero Message Queue (zmq) to publish the control messages from a local joystick
@@ -797,8 +850,7 @@ class JoyStickPub(object):
     def __init__(self, port=5556, dev_fn='/dev/input/js0'):
         import zmq
         self.dev_fn = dev_fn
-        # self.js = UnknownJoystick(self.dev_fn)
-        self.js = XboxOneJoystick(self.dev_fn)
+        self.js = UnknownJoystick(self.dev_fn)
         self.js.init()
         context = zmq.Context()
         self.socket = context.socket(zmq.PUB)
