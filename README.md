@@ -1,6 +1,6 @@
 The code for this part was copied from [Tawn Kramer's](https://github.com/tawnkramer/donkey) fork of donkeycar.
 
-# PS3/PS4 Joystick Controller
+# PS3/PS4/XBox One Joystick Controller
 
 The default web controller may be replaced with a one line change to use a physical joystick part for input. This uses
 the OS device /dev/input/js0 by default. In theory, any joystick device that the OS mounts like this can be used. In
