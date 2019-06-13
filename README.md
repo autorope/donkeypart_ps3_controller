@@ -89,6 +89,30 @@ To test that the Bluetooth PS3 remote is working, verify that /dev/input/js0 exi
 ls /dev/input/js0
 ```
 
+##### Troubleshooting
+In case the BT connection on the Raspberry Pi does not work, you see might something like this in `bluetoothctl`:
+```
+[NEW] Controller 00:11:22:33:44:55 super-donkey [default]
+[NEW] Device AA:BB:CC:DD:EE:FF PLAYSTATION(R)3 Controller
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: yes
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: no
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: yes
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: no
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: yes
+...
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: yes
+[CHG] Device AA:BB:CC:DD:EE:FF Connected: no
+[bluetooth]#
+```
+Try updating the Linux kernel and firmware by running:
+```
+sudo rpi-update
+```
+And then reboot:
+```
+sudo reboot
+```
+
 #### PS4 Controller
 
 The following instructions are based on [RetroPie](https://github.com/RetroPie/RetroPie-Setup/wiki/PS4-Controller#installation) and [ds4drv](https://github.com/chrippa/ds4drv).
